@@ -15,6 +15,12 @@ func NewCameraHandler(svc *service.CameraService) *CameraHandler {
 }
 
 func (h *CameraHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"online":"true"}`))
+	})
+
 	mux.HandleFunc("POST /cameras", h.Register)
 	mux.HandleFunc("GET /cameras", h.List)
 	mux.HandleFunc("GET /cameras/{id}", h.GetByID)

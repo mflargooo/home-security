@@ -4,18 +4,21 @@ import (
 	"context"
 
 	"github.com/mflargooo/internal/models"
+	"github.com/mflargooo/internal/store"
 )
 
 type CameraService struct {
-	// TODO: service
+	cameraStore *store.CameraStore
+	stateStore  *store.CameraStateStore
 }
 
-func NewCameraService( /* TODO: service */ ) *CameraService {
+func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraStateStore) *CameraService {
 	return &CameraService{
-		// TODO: service
+		cameraStore: cameraStore,
+		stateStore:  stateStore,
 	}
 }
 
 func (s *CameraService) Register(ctx context.Context, req models.CreateCameraRequest) {
-	
+
 }
