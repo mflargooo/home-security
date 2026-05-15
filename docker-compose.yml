@@ -4,7 +4,9 @@ services:
   postgres:
     image: postgres:16-alpine
     env_file: .env
-    restart: always
+    restart: unless-stopped
+    volumes:
+      - ${APP_DIR}/database/cameras-data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}
     healthcheck:
@@ -16,7 +18,7 @@ services:
   redis:
     image: redis:8.6.3-alpine
     env_file: .env
-    restart: always
+    restart: unless-stopped
     ports:
       - ${REDIS_PORT}
     command: redis-server --save "" --appendonly no --requirepass ${REDIS_PASSWORD}
@@ -26,7 +28,18 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
-
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ${APP_DIR}/mediamtx/mediamtx.yml:/mediamtx.yml
+    ports:
+      - 8554:8554
+      - 8322:8322
+      - 1935:1935
+      - 8888:8888
+      - 8889:8889
   backend:
     build: ./backend
     env_file: .env
@@ -37,3 +50,6 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+
+volumes:
+  cameras-data:

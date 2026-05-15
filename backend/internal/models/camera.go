@@ -15,7 +15,7 @@ type Camera struct {
 	ID         string            `json:"id" db:"id"`
 	Name       string            `json:"name" db:"name"`
 	RTSPUrl    string            `json:"rtsp_url" db:"rtsp_url"`
-	IPAddress  string            `json:"ip_address" db:"ip_address"`
+	MACAddress string            `json:"mac_address" db:"mac_address"`
 	Status     CameraStatus      `json:"status" db:"status"`
 	Metadata   map[string]string `json:"metadata,omitempty" db:"metadata"`
 	CreatedAt  time.Time         `json:"created_at" db:"created_at"`
@@ -33,18 +33,18 @@ type CameraState struct {
 }
 
 type CreateCameraRequest struct {
-	Name      string            `json:"name" validate:"required,min=1,max=100"`
-	RTSPUrl   string            `json:"rtsp_url" validate:"required,url"`
-	IPAddress string            `json:"ip_address" validate:"omitempty,ip"`
-	Metadata  map[string]string `json:"metadata,omitempty"`
+	Name       string            `json:"name" validate:"required,min=1,max=100"`
+	RTSPUrl    string            `json:"rtsp_url" validate:"required,url"`
+	MACAddress string            `json:"mac_address" validate:"omitempty,mac"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
 type UpdateCameraRequest struct {
-	Name      *string           `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
-	RTSPUrl   *string           `json:"rtsp_url,omitempty" validate:"omitempty,url"`
-	Status    *CameraStatus     `json:"status,omitempty"`
-	IPAddress *string           `json:"ip_address,omitempty" validate:"omitempty,ip"`
-	Metadata  map[string]string `json:"metadata,omitempty"`
+	Name       *string           `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
+	RTSPUrl    *string           `json:"rtsp_url,omitempty" validate:"omitempty,url"`
+	Status     *CameraStatus     `json:"status,omitempty"`
+	MACAddress *string           `json:"mac_address,omitempty" validate:"omitempty,mac"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
 type CameraResponse struct {
