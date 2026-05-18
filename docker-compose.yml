@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # databases
   postgres:
     image: postgres:16-alpine
     env_file: .env
@@ -28,18 +29,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
-  mediamtx:
-    image: bluenviron/mediamtx:latest
-    network_mode: host
-    restart: unless-stopped
-    volumes:
-      - ${APP_DIR}/mediamtx/mediamtx.yml:/mediamtx.yml
-    ports:
-      - 8554:8554
-      - 8322:8322
-      - 1935:1935
-      - 8888:8888
-      - 8889:8889
   migrate:
     image: migrate/migrate
     depends_on:
@@ -54,6 +43,21 @@ services:
     ]
     restart: on-failure
 
+  # stream handling
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    restart: unless-stopped
+    volumes:
+      - ${APP_DIR}/mediamtx/mediamtx.yml:/mediamtx.yml
+    ports:
+      - 8554:8554
+      - 8322:8322
+      - 1935:1935
+      - 8888:8888
+      - 8889:8889
+    profiles: ["mediamtx"]
+
+  # application
   backend:
     build: ./backend
     env_file: .env
