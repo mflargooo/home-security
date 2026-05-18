@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mflargooo/internal/api/handler"
 	"github.com/mflargooo/internal/config"
-	"github.com/mflargooo/internal/handler"
 	"github.com/mflargooo/internal/service"
 	"github.com/mflargooo/internal/store"
 	"github.com/redis/go-redis/v9"

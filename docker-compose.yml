@@ -14,7 +14,7 @@ services:
       interval: 3s
       timeout: 10s
       retries: 5
-      start_period: 5s
+      start_period: 30s
   redis:
     image: redis:8.6.3-alpine
     env_file: .env
@@ -40,6 +40,20 @@ services:
       - 1935:1935
       - 8888:8888
       - 8889:8889
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ${APP_DIR}/database/migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable",
+      "up"
+    ]
+    restart: on-failure
+
   backend:
     build: ./backend
     env_file: .env
@@ -48,8 +62,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
-
-volumes:
-  cameras-data:

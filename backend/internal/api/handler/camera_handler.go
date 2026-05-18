@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
+	"github.com/mflargooo/internal/models"
 	"github.com/mflargooo/internal/service"
 )
 
@@ -31,7 +35,25 @@ func (h *CameraHandler) RegisterRoutes(mux *http.ServeMux) {
 }
 
 func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
+	var req models.CreateCameraRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("register camera: %v", err)
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
 
+	if err := validateCreateRequest(req); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	camera, err := h.svc.Register(r.Context(), req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to register camera")
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, camera)
 }
 
 func (h *CameraHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -56,4 +78,24 @@ func (h *CameraHandler) ReportOnline(w http.ResponseWriter, r *http.Request) {
 
 func (h *CameraHandler) ReportOffline(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func writeJSON(w http.ResponseWriter, status int, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(v)
+}
+
+func writeError(w http.ResponseWriter, status int, msg string) {
+	writeJSON(w, status, map[string]string{"error": msg})
+}
+
+func validateCreateRequest(req models.CreateCameraRequest) error {
+	if req.Name == "" {
+		return errors.New("name is required")
+	}
+	if req.RTSPUrl == "" {
+		return errors.New("rtsp_url is required")
+	}
+	return nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mflargooo/internal/models"
 	"github.com/mflargooo/internal/store"
@@ -19,6 +20,11 @@ func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraSt
 	}
 }
 
-func (s *CameraService) Register(ctx context.Context, req models.CreateCameraRequest) {
+func (s *CameraService) Register(ctx context.Context, req models.CreateCameraRequest) (*models.CameraResponse, error) {
+	camera, err := s.cameraStore.Create(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("register camera: %w", err)
+	}
 
+	return &models.CameraResponse{Camera: *camera}, nil
 }
