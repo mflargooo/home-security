@@ -6,17 +6,20 @@ import (
 
 	"github.com/mflargooo/internal/models"
 	"github.com/mflargooo/internal/store"
+	"github.com/mflargooo/internal/workers"
 )
 
 type CameraService struct {
 	cameraStore *store.CameraStore
 	stateStore  *store.CameraStateStore
+	manager     *workers.FFmpegManager
 }
 
-func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraStateStore) *CameraService {
+func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraStateStore, manager *workers.FFmpegManager) *CameraService {
 	return &CameraService{
 		cameraStore: cameraStore,
 		stateStore:  stateStore,
+		manager:     manager,
 	}
 }
 
@@ -25,6 +28,8 @@ func (s *CameraService) Register(ctx context.Context, req models.CreateCameraReq
 	if err != nil {
 		return nil, 0, fmt.Errorf("register camera: %w", err)
 	}
+
+	s.onCameraUpdated(ctx, camera.ID, camera.RTSPUrl)
 
 	return &models.CameraResponse{Camera: *camera}, result, nil
 }
@@ -47,4 +52,12 @@ func (s *CameraService) List(ctx context.Context, status *models.CameraStatus) (
 
 func (s *CameraService) Get(ctx context.Context, id string) (*models.CameraResponse, error) {
 	return nil, nil
+}
+
+func (s *CameraService) onCameraUpdated(ctx context.Context, id string, url string) {
+	if url == "" {
+		return
+	}
+
+	s.manager.UpsertWorker(id, url)
 }

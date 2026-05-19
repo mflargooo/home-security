@@ -9,5 +9,7 @@ FROM alpine:3.18
 WORKDIR /app
 COPY --from=builder /app/home_security .
 
+RUN apk add --no-cache python3 py3-pip ffmpeg
+    
 EXPOSE 8080
 CMD ["./home_security"]

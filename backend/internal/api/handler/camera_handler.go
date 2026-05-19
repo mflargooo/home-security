@@ -34,6 +34,7 @@ func (h *CameraHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /cameras/{id}/offline", h.ReportOffline)
 }
 
+// if rtsp url is given, read stream into mediamtx. otherwise assumes camera will push to expected path
 func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateCameraRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -59,7 +60,12 @@ func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
 		httpStatus = http.StatusCreated
 	}
 	writeJSON(w, httpStatus, camera.ID)
-	log.Printf("[CREATE] camera created with: %s", camera.ID)
+
+	if httpStatus == http.StatusCreated {
+		log.Printf("[REGISTER] created %s", camera.ID)
+	} else {
+		log.Printf("[REGISTER] upserted %s", camera.ID)
+	}
 }
 
 func (h *CameraHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +89,7 @@ func (h *CameraHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// if rtsp url is given, read stream into mediamtx. otherwise if rtsp url is cleared assumes camera will push to expected path
 func (h *CameraHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/mflargooo/internal/config"
 	"github.com/mflargooo/internal/service"
 	"github.com/mflargooo/internal/store"
+	"github.com/mflargooo/internal/workers"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -53,7 +54,8 @@ func main() {
 	// -- Setup
 	cameraStore := store.NewCameraStore(db)
 	stateStore := store.NewCameraStateStore(rdb)
-	cameraSvc := service.NewCameraService(cameraStore, stateStore)
+	ffmpegManager := workers.NewFFmpegManager(cfg.MediaMTX)
+	cameraSvc := service.NewCameraService(cameraStore, stateStore, ffmpegManager)
 	cameraHandler := handler.NewCameraHandler(cameraSvc)
 
 	// -- Route
