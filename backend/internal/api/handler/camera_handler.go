@@ -7,6 +7,7 @@ import (
 
 	"github.com/mflargooo/internal/models"
 	"github.com/mflargooo/internal/service"
+	"github.com/mflargooo/internal/store"
 )
 
 type CameraHandler struct {
@@ -46,14 +47,18 @@ func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	camera, err := h.svc.Register(r.Context(), req)
+	camera, result, err := h.svc.Register(r.Context(), req)
 	if err != nil {
 		log.Printf("register camera: %v", err)
 		writeError(w, http.StatusInternalServerError, "failed to register camera")
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, camera.ID)
+	httpStatus := http.StatusOK
+	if result == store.UpsertCreated {
+		httpStatus = http.StatusCreated
+	}
+	writeJSON(w, httpStatus, camera.ID)
 	log.Printf("[CREATE] camera created with: %s", camera.ID)
 }
 

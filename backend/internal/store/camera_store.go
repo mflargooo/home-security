@@ -23,41 +23,73 @@ func NewCameraStore(db *pgxpool.Pool) *CameraStore {
 	return &CameraStore{db: db}
 }
 
-func (s *CameraStore) Create(ctx context.Context, req models.CreateCameraRequest) (*models.Camera, error) {
-	camera := &models.Camera{
-		ID:        uuid.New().String(),
-		Name:      req.Name,
-		RTSPUrl:   req.RTSPUrl,
-		Status:    models.StatusActive,
-		Metadata:  req.Metadata,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
+type UpsertResult int
+
+const (
+	UpsertCreated  UpsertResult = iota // new cam
+	UpsertReturned                     // registered url
+)
+
+// IDEMPOTENT: true if new insert, false if old returned
+func (s *CameraStore) Create(ctx context.Context, req models.CreateCameraRequest) (*models.Camera, UpsertResult, error) {
+	metaJSON, err := json.Marshal(req.Metadata)
+	if err != nil {
+		return nil, 0, fmt.Errorf("marshal metadata: %w", err)
 	}
 
-	metaJSON, err := json.Marshal(camera.Metadata)
-	if err != nil {
-		return nil, fmt.Errorf("marshal metadata: %w", err)
-	}
+	now := time.Now().UTC()
+	id := uuid.New().String()
 
 	query := `
 		INSERT INTO cameras (id, name, rtsp_url, status, metadata, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		ON CONFLICT (rtsp_url) DO UPDATE SET
+			name = EXCLUDED.name,
+			metadata = EXCLUDED.metadata,
+			updated_at = EXCLUDED.updated_at
+		RETURNING id, name, rtsp_url, status, metadata, created_at, updated_at, (xmax = 0) AS inserted
 	`
 
-	_, err = s.db.Exec(ctx, query,
-		camera.ID,
-		camera.Name,
-		camera.RTSPUrl,
-		camera.Status,
+	var camera models.Camera
+	var metaOut []byte
+	var wasInserted bool
+
+	err = s.db.QueryRow(ctx, query,
+		id,
+		req.Name,
+		req.RTSPUrl,
+		models.StatusActive,
 		metaJSON,
-		camera.CreatedAt,
-		camera.UpdatedAt,
+		now,
+		now,
+	).Scan(
+		&camera.ID,
+		&camera.Name,
+		&camera.RTSPUrl,
+		&camera.Status,
+		&metaOut,
+		&now,
+		&now,
+		&wasInserted,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("insert camera: %w", err)
+		return nil, 0, fmt.Errorf("upsert camera: %w", err)
 	}
 
-	return camera, nil
+	if len(metaOut) > 0 {
+		if err := json.Unmarshal(metaOut, &camera.Metadata); err != nil {
+			return nil, 0, fmt.Errorf("unmarshal metadata: %w", err)
+		}
+	}
+
+	var result UpsertResult
+	if wasInserted {
+		result = UpsertCreated
+	} else {
+		result = UpsertReturned
+	}
+
+	return &camera, result, nil
 }
 
 func (s *CameraStore) GetByID(ctx context.Context, id string) (*models.Camera, error) {
@@ -86,7 +118,45 @@ func (s *CameraStore) GetByID(ctx context.Context, id string) (*models.Camera, e
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("query camera: %w", err)
+		return nil, fmt.Errorf("query camera by id: %w", err)
+	}
+
+	if len(metaJSON) > 0 {
+		if err := json.Unmarshal(metaJSON, &camera.Metadata); err != nil {
+			return nil, fmt.Errorf("unmarshal metadata: %w", err)
+		}
+	}
+
+	return &camera, nil
+}
+
+func (s *CameraStore) GetByRTSPURL(ctx context.Context, url string) (*models.Camera, error) {
+	query := `
+		SELECT id, name, rtsp_url, status, metadata, created_at, updated_at, last_seen_at
+		FROM cameras
+		WHERE rtsp_url = $1
+	`
+
+	var camera models.Camera
+	var metaJSON []byte
+
+	err := s.db.QueryRow(ctx, query, url).Scan(
+		&camera.ID,
+		&camera.Name,
+		&camera.RTSPUrl,
+		&camera.Status,
+		&camera.Metadata,
+		&camera.CreatedAt,
+		&camera.UpdatedAt,
+		&camera.LastSeenAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, ErrNotFound
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("query camera by rtsp_url: %w", err)
 	}
 
 	if len(metaJSON) > 0 {
@@ -100,7 +170,7 @@ func (s *CameraStore) GetByID(ctx context.Context, id string) (*models.Camera, e
 
 func (s *CameraStore) List(ctx context.Context, status *models.CameraStatus) ([]*models.Camera, error) {
 	query := `
-		SELECT id, name, rtsp_url, status, metadata, created_at, update_at, last_seen_at
+		SELECT id, name, rtsp_url, status, metadata, created_at, updated_at, last_seen_at
 		FROM cameras
 	`
 
@@ -129,7 +199,7 @@ func (s *CameraStore) List(ctx context.Context, status *models.CameraStatus) ([]
 			&camera.Name,
 			&camera.RTSPUrl,
 			&camera.Status,
-			metaJSON,
+			&metaJSON,
 			&camera.CreatedAt,
 			&camera.UpdatedAt,
 			&camera.LastSeenAt,

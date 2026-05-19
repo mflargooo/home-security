@@ -20,13 +20,13 @@ func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraSt
 	}
 }
 
-func (s *CameraService) Register(ctx context.Context, req models.CreateCameraRequest) (*models.CameraResponse, error) {
-	camera, err := s.cameraStore.Create(ctx, req)
+func (s *CameraService) Register(ctx context.Context, req models.CreateCameraRequest) (*models.CameraResponse, store.UpsertResult, error) {
+	camera, result, err := s.cameraStore.Create(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("register camera: %w", err)
+		return nil, 0, fmt.Errorf("register camera: %w", err)
 	}
 
-	return &models.CameraResponse{Camera: *camera}, nil
+	return &models.CameraResponse{Camera: *camera}, result, nil
 }
 
 func (s *CameraService) List(ctx context.Context, status *models.CameraStatus) ([]*models.CameraResponse, error) {
@@ -43,4 +43,8 @@ func (s *CameraService) List(ctx context.Context, status *models.CameraStatus) (
 
 	return responses, nil
 
+}
+
+func (s *CameraService) Get(ctx context.Context, id string) (*models.CameraResponse, error) {
+	return nil, nil
 }
