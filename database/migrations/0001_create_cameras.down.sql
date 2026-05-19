@@ -1,0 +1,1 @@
+-- migrations/0001_create_cameras.down.sql
