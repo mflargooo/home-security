@@ -28,3 +28,19 @@ func (s *CameraService) Register(ctx context.Context, req models.CreateCameraReq
 
 	return &models.CameraResponse{Camera: *camera}, nil
 }
+
+func (s *CameraService) List(ctx context.Context, status *models.CameraStatus) ([]*models.CameraResponse, error) {
+	cameras, err := s.cameraStore.List(ctx, status)
+	if err != nil {
+		return nil, fmt.Errorf("list cameras: %w", err)
+	}
+
+	responses := make([]*models.CameraResponse, len(cameras))
+
+	for i, c := range cameras {
+		responses[i] = &models.CameraResponse{Camera: *c}
+	}
+
+	return responses, nil
+
+}

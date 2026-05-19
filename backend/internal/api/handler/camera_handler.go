@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 
@@ -49,15 +48,30 @@ func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	camera, err := h.svc.Register(r.Context(), req)
 	if err != nil {
+		log.Printf("register camera: %v", err)
 		writeError(w, http.StatusInternalServerError, "failed to register camera")
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, camera)
+	writeJSON(w, http.StatusCreated, camera.ID)
+	log.Printf("[CREATE] camera created with: %s", camera.ID)
 }
 
 func (h *CameraHandler) List(w http.ResponseWriter, r *http.Request) {
+	var statusFilter *models.CameraStatus
+	if s := r.URL.Query().Get("status"); s != "" {
+		status := models.CameraStatus(s)
+		statusFilter = &status
+	}
 
+	cameras, err := h.svc.List(r.Context(), statusFilter)
+	if err != nil {
+		log.Printf("list cameras: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to list cameras")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, cameras)
 }
 
 func (h *CameraHandler) GetByID(w http.ResponseWriter, r *http.Request) {
@@ -91,11 +105,5 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 }
 
 func validateCreateRequest(req models.CreateCameraRequest) error {
-	if req.Name == "" {
-		return errors.New("name is required")
-	}
-	if req.RTSPUrl == "" {
-		return errors.New("rtsp_url is required")
-	}
 	return nil
 }
