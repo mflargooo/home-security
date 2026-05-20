@@ -67,7 +67,7 @@ func (m *FFmpegManager) DeleteWorker(id string) {
 }
 
 func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url string) {
-	outputURL := m.resolver.StreamURL("/cameras/" + id + "/stream")
+	outputURL := m.resolver.StreamURL("/stream/" + id)
 	log.Printf("[FFMPEG] worker=%s streaming video to public=%q", id, outputURL)
 
 	for {

@@ -10,13 +10,15 @@ function App() {
   const [cameras, setCameras] = useState<Camera[]>([]);
 
   const loadCameras = async () => {
-    const data = await fetchCameras();
-    setCameras(data);
+    const data : Camera[] = await fetchCameras();
+    setCameras(data.map((camera, i) => ({
+      ...camera,
+      name: camera.name || `CAMERA-${i.toString().padStart(3, '0')}`
+    })))
   }
 
   useEffect(() => {
     loadCameras()
-    return () => {}
   }, [])
 
   return (
@@ -26,18 +28,15 @@ function App() {
         <div className="text-slate-400 w-fit">PLACEHOLDER</div>
         <div className="text-slate-400 w-fit">PLACEHOLDER</div>
       </div>
-      <div className="mx-auto h-screen w-[80vw]">
+      {cameras.length > 0 && <div className="mx-auto h-screen w-[80vw]">
         <div className="p-[.5rem] h-fit bg-slate-700 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {cameras.map((camera, i) => {
-            if (camera.name === '') { // set default camera name
-              camera.name = "CAMERA-" + i.toString().padStart(3, "0")
-            };
             return (
                 <CameraCard key={camera.id} camera={camera} onClick={() => {setSelectedCamera(camera)}} index={i}></CameraCard>
             )
           })}
         </div>
-      </div>
+      </div>}
 
       {selectedCamera &&
         <div className="absolute inset-0 items-center justify-center">

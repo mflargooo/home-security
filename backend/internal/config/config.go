@@ -6,10 +6,9 @@ import (
 )
 
 type Config struct {
-	Postgres   PostgresConfig
-	Redis      RedisConfig
-	MediaMTX   MediaMTXConfig
-	ListenAddr string
+	Postgres PostgresConfig
+	Redis    RedisConfig
+	MediaMTX MediaMTXConfig
 }
 
 type PostgresConfig struct {
@@ -69,6 +68,5 @@ func Load() *Config {
 			Host: os.Getenv("MEDIAMTX_HOST"),
 			Port: os.Getenv("MEDIAMTX_PORT"),
 		},
-		ListenAddr: os.Getenv("LISTEN_ADDR"),
 	}
 }

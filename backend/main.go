@@ -64,14 +64,14 @@ func main() {
 	cameraHandler.RegisterRoutes(mux)
 
 	server := &http.Server{
-		Addr:         cfg.ListenAddr,
+		Addr:         ":8080",
 		Handler:      middleware.Cors(mux),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Listening at %s\n", cfg.ListenAddr)
+	log.Printf("Listening at %s\n", ":8080")
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen: %v", err)
 	}
