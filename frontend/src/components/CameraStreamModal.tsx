@@ -2,15 +2,14 @@ import { useRef, useEffect, useState, type Key } from "react"
 import type { Camera } from "../types/Camera";
 import { getStreamUrl } from "../utils/api"
 import type { Hls } from "hls.js"
-
-import { EllipsisVertical, X } from "lucide-react"
+import { ModalBar } from "./ModalBar";
 
 type CameraProps = {
     camera: Camera
     onClose: () => void
 }
 
-export function CameraModal({ camera, onClose } : CameraProps) {
+export function CameraStreamModal({ camera, onClose } : CameraProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [streamState, setStreamState] = useState('loading'); // loading | playing | error | unsupported
@@ -115,13 +114,7 @@ export function CameraModal({ camera, onClose } : CameraProps) {
                     w-full max-w-5xl shadow-2xl h-fit
                 "
             >
-                <div className="flex text-slate-400 p-[.375rem] lg:p-[.5rem] justify-between">
-                    <button className="bg-red-700 border-red-900 border rounded-[100%] hover:bg-red-500 w-fit h-fi my-auto" onClick={() => onClose()}><X/>
-                    </button>
-                    <span className="font-bold text-lg md:text-xl lg:text-2xl"> {camera.name} </span>
-                    <button className="hover:bg-slate-500/50 border rounded-[100%] border-none w-fit h-fit my-auto"><EllipsisVertical/>
-                    </button>
-                </div>
+                <ModalBar title={camera.name} xOnClick={() => onClose()} ellipsisOnClick={null} />
                 <div className={``} style={{ aspectRatio: '16/9' }}>
                     <video 
                         ref={videoRef} 

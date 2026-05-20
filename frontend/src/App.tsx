@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import type { Camera } from './types/Camera';
-import { CameraModal } from './components/CameraModal';
+import { CameraStreamModal } from './components/CameraStreamModal';
 import { CameraCard } from './components/CameraCard';
 import { mockCameras } from './data/mockCameras';
 
@@ -27,7 +27,7 @@ function App() {
 
       {selectedCamera &&
         <div className="absolute inset-0 items-center justify-center">
-          <CameraModal camera={selectedCamera} onClose={() => setSelectedCamera(null)}></CameraModal>
+          <CameraStreamModal camera={selectedCamera} onClose={() => setSelectedCamera(null)}></CameraStreamModal>
         </div>
       }
     </div>
