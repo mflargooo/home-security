@@ -7,7 +7,6 @@ import { mockCameras } from './data/mockCameras';
 
 function App() {
   const [selectedCamera, setSelectedCamera] = useState<Camera | null>(null);
-  console.log(selectedCamera);
 
   return (
     <div id="bg" className="h-screen w-screen bg-slate-800">

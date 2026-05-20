@@ -12,17 +12,20 @@ export function CameraCard({ camera, onClick, index } : CameraCardProps) {
         <div 
             className="
                 group relative aspect-video bg-slate-800 border border-slate-900 border-3 rounded-md text-red-500
-                hover:bg-slate-700 transition-all duration-200 overflow-hidden p-[.5rem] hover:border-accent 
+                transition-all duration-200 overflow-hidden p-[.25rem] hover:border-accent 
             " 
         >
-            <div className="absolute inset-0 p-[1rem]">
+            <div id="thumbnail" className="bg-slate-800 w-full h-full rounded-sm">
+
+            </div>
+            <div className="absolute bottom-0 left-0 p-[.5rem] w-full bg-slate-900/90">
                 <div className="justify-between">
                     <div className="font-bold text-slate-500 text-md xl:text-lg"> {camera.name} </div>
                     <div className="italic text-slate-500 text-xs xl:text-sm mt-[-.125rem]"> {camera.id.toUpperCase()} </div>
                 </div>
             </div>
             <div 
-                className="opacity-0 group-hover:opacity-100 transition-opacity absolute flex inset-0 items-center justify-center"
+                className="absolute flex inset-0 items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-slate-700/30  transition-opacity"
                 onClick={() => onClick(camera)}
             >
                 <span className="font-bold text-lg xl:text-2xl text-slate-400">View Stream</span>

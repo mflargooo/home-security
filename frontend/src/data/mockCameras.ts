@@ -5,9 +5,9 @@ const ago = (mins : number): string => new Date(now.getTime() - mins * 60000).to
 
 export const mockCameras : Camera[] = [
   {
-    id: "cam-001",
+    id: "73e154d7-c329-446d-a2f3-48f8c9d6733f",
     name: "Front Entrance",
-    rtsp_url: "rtsp://192.168.1.100:554/stream1",
+    rtsp_url: "rtsp://localhost:8554/test", //"rtsp://192.168.1.100:554/stream1",
     status: "active",
     metadata: { location: "Building A", floor: "Ground", zone: "Perimeter" },
     created_at: ago(43200),
