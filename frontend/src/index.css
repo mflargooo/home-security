@@ -8,14 +8,23 @@ html, body, .root {
   box-sizing: border-box;
 }
 
+.form-category {
+  @apply w-full h-fit px-2
+}
+.form-category-header {
+  @apply text-xl text-slate-400 font-bold
+}
+.form-category-divider {
+  @apply h-[.05rem] w-full bg-slate-400 mt-[.1rem] mb-[.5rem];
+}
 .form-entry {
-  @apply w-full grid grid-cols-[9.25rem_max-content] items-center justify-around py-[.05rem];
+  @apply w-full grid grid-cols-[5rem_max-content] items-center justify-around py-[.05rem];
 }
 form label {
   @apply text-slate-400 font-bold text-base lg:text-lg;
 }
 form input {
-  @apply w-[20rem] border bg-slate-400 text-black px-[.25rem];
+  @apply w-[20rem] lg:w-[23rem] border bg-slate-400 text-black px-[.25rem];
 }
 form input:read-only {
   @apply bg-slate-800 text-slate-500 border-none;

@@ -27,7 +27,7 @@ function App() {
         <div className="text-slate-400 w-fit">PLACEHOLDER</div>
       </div>
       <div className="mx-auto h-screen w-[80vw]">
-        <div className="p-[.5rem] h-fit bg-slate-700 grid grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="p-[.5rem] h-fit bg-slate-700 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {cameras.map((camera, i) => {
             if (camera.name === '') { // set default camera name
               camera.name = "CAMERA-" + i.toString().padStart(3, "0")

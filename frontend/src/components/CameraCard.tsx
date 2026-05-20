@@ -6,7 +6,6 @@ type CameraCardProps = {
     index: number;
 }
 export function CameraCard({ camera, onClick, index } : CameraCardProps) {
-    const { id, name, status, metadata, last_seen_at } = camera;
     index;
     return (
         <div 
@@ -20,8 +19,8 @@ export function CameraCard({ camera, onClick, index } : CameraCardProps) {
             </div>
             <div className="absolute bottom-0 left-0 p-[.5rem] w-full bg-slate-900/90">
                 <div className="justify-between">
-                    <div className="font-bold text-slate-500 text-md xl:text-lg"> {camera.name} </div>
-                    <div className="italic text-slate-500 text-xs xl:text-sm mt-[-.125rem]"> {camera.id.toUpperCase()} </div>
+                    <div className="font-bold text-slate-500 text-base"> {camera.name} </div>
+                    <div className="italic text-slate-500 text-xs mt-[-.125rem]"> {camera.id.toUpperCase()} </div>
                 </div>
             </div>
             <div 

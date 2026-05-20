@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState, type Key } from "react"
+import { useRef, useEffect, useState } from "react"
 import type { Camera } from "../types/Camera";
 import { getStreamUrl } from "../utils/api"
-import type { Hls } from "hls.js"
+import Hls from "hls.js"
 import { Modal } from "./Modal";
 import { CameraSettingsModal } from "./CameraSettingsModal";
 
@@ -27,7 +27,7 @@ export function CameraStreamModal({ camera, onClose } : CameraProps) {
     return () => document.removeEventListener('keydown', handleKey);
   }, [onClose]);
   */
- 
+  streamState;
   useEffect(() => {
     if (!isStreamable || !videoRef.current) {
       setStreamState(camera.status === 'active' ? 'error' : 'unsupported');
