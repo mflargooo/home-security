@@ -34,6 +34,10 @@ func (m *FFmpegManager) UpsertWorker(id string, url string) {
 	m.mu.Lock()
 
 	if old, ok := m.workers[id]; ok {
+		if url == old.url {
+			m.mu.Unlock()
+			return
+		}
 		old.cancel()
 	}
 
@@ -41,6 +45,7 @@ func (m *FFmpegManager) UpsertWorker(id string, url string) {
 
 	worker := &FFmpegWorker{
 		id:     id,
+		url:    url,
 		cancel: cancel,
 	}
 

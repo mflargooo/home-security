@@ -2,7 +2,8 @@ import { useRef, useEffect, useState, type Key } from "react"
 import type { Camera } from "../types/Camera";
 import { getStreamUrl } from "../utils/api"
 import type { Hls } from "hls.js"
-import { ModalBar } from "./ModalBar";
+import { Modal } from "./Modal";
+import { CameraSettingsModal } from "./CameraSettingsModal";
 
 type CameraProps = {
     camera: Camera
@@ -13,11 +14,11 @@ export function CameraStreamModal({ camera, onClose } : CameraProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [streamState, setStreamState] = useState('loading'); // loading | playing | error | unsupported
-  const [fullscreen, setFullscreen] = useState(false);
-  const [activeTab, setActiveTab] = useState('stream');
+  const [settingsIsOpen, setSettingsIsOpen] = useState<boolean>(false); 
 
   const isStreamable = camera.status === 'active';
 
+  /*
   useEffect(() => {
     const handleKey = (e : KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -25,7 +26,8 @@ export function CameraStreamModal({ camera, onClose } : CameraProps) {
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   }, [onClose]);
-
+  */
+ 
   useEffect(() => {
     if (!isStreamable || !videoRef.current) {
       setStreamState(camera.status === 'active' ? 'error' : 'unsupported');
@@ -91,40 +93,23 @@ export function CameraStreamModal({ camera, onClose } : CameraProps) {
     };
   }, [camera.id, isStreamable, camera.status]);
 
-  const toggleFullscreen = () => {
-    const el = document.getElementById('camera-modal-video');
-    if (!document.fullscreenElement) {
-      el?.requestFullscreen();
-      setFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setFullscreen(false);
-    }
-  };
-
-    return (
-        <div 
-            className="fixed inset-0 z-50 flex modal-backdrop items-center justify-center bg-slate-900/80" 
-            onClick={(e) => e.target === e.currentTarget ? onClose() : (() => {})()}
-        >
-            <div 
-                className="
-                    relative inset-0 m-auto bg-slate-900 
-                    border border-rounded rounded-xl overflow-hidden
-                    w-full max-w-5xl shadow-2xl h-fit
-                "
-            >
-                <ModalBar title={camera.name} xOnClick={() => onClose()} ellipsisOnClick={null} />
-                <div className={``} style={{ aspectRatio: '16/9' }}>
-                    <video 
-                        ref={videoRef} 
-                        className={`w-full h-full`} 
-                        autoPlay 
-                        playsInline
-                        controls
-                    />
-                </div>
-            </div>
+  return (
+    <>
+      <Modal className="w-full max-w-5xl" title={camera.name} onClose={() => { setSettingsIsOpen(false); onClose() }} ellipsisOnClick={() => setSettingsIsOpen(true)}>
+        <div style={{ aspectRatio: '16/9' }}>
+          <video 
+              ref={videoRef} 
+              className={`w-full h-full`} 
+              autoPlay 
+              playsInline
+              controls
+          />
         </div>
-    )
+      </Modal>
+
+      {settingsIsOpen && 
+        <CameraSettingsModal camera={camera} onClose={() => setSettingsIsOpen(false)} />
+      }
+    </>
+  )
 }

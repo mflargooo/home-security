@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import type { Camera } from './types/Camera';
 import { CameraStreamModal } from './components/CameraStreamModal';
 import { CameraCard } from './components/CameraCard';
-import { mockCameras } from './data/mockCameras';
+import { fetchCameras } from './utils/api';
 
 function App() {
   const [selectedCamera, setSelectedCamera] = useState<Camera | null>(null);
+  const [cameras, setCameras] = useState<Camera[]>([]);
+
+  const loadCameras = async () => {
+    const data = await fetchCameras();
+    setCameras(data);
+  }
+
+  useEffect(() => {
+    loadCameras()
+    return () => {}
+  }, [])
 
   return (
     <div id="bg" className="h-screen w-screen bg-slate-800">
@@ -17,7 +28,10 @@ function App() {
       </div>
       <div className="mx-auto h-screen w-[80vw]">
         <div className="p-[.5rem] h-fit bg-slate-700 grid grid-cols-2 xl:grid-cols-3 gap-3">
-          {mockCameras.map((camera, i) => {
+          {cameras.map((camera, i) => {
+            if (camera.name === '') { // set default camera name
+              camera.name = "CAMERA-" + i.toString().padStart(3, "0")
+            };
             return (
                 <CameraCard key={camera.id} camera={camera} onClick={() => {setSelectedCamera(camera)}} index={i}></CameraCard>
             )
