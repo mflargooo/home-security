@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/mflargooo/internal/models"
@@ -51,7 +52,43 @@ func (s *CameraService) List(ctx context.Context, status *models.CameraStatus) (
 }
 
 func (s *CameraService) Get(ctx context.Context, id string) (*models.CameraResponse, error) {
-	return nil, nil
+	camera, err := s.cameraStore.GetByID(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, store.ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get camera: %w", err)
+	}
+
+	return &models.CameraResponse{Camera: *camera}, nil
+}
+
+func (s *CameraService) Update(ctx context.Context, id string, req models.UpdateCameraRequest) (*models.CameraResponse, error) {
+	camera, err := s.cameraStore.Update(ctx, id, req)
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, store.ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("update camera: %w", err)
+	}
+
+	if camera.RTSPUrl == "" {
+		s.manager.DeleteWorker(camera.ID)
+	} else {
+		s.onCameraUpdated(ctx, camera.ID, camera.RTSPUrl)
+	}
+
+	return &models.CameraResponse{Camera: *camera}, nil
+}
+
+func (s *CameraService) Delete(ctx context.Context, id string) error {
+	if err := s.cameraStore.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	s.manager.DeleteWorker(id)
+
+	return nil
 }
 
 func (s *CameraService) onCameraUpdated(ctx context.Context, id string, url string) {

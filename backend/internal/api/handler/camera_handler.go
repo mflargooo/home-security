@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -86,16 +87,70 @@ func (h *CameraHandler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CameraHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		writeError(w, http.StatusBadRequest, "missing camera id")
+		return
+	}
 
+	camera, err := h.svc.Get(r.Context(), id)
+	if errors.Is(err, store.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "camera not found")
+		return
+	}
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get camera")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, camera)
 }
 
 // if rtsp url is given, read stream into mediamtx. otherwise if rtsp url is cleared assumes camera will push to expected path
 func (h *CameraHandler) Update(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		writeError(w, http.StatusBadRequest, "missing camera id")
+		return
+	}
 
+	var req models.UpdateCameraRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	camera, err := h.svc.Update(r.Context(), id, req)
+	if errors.Is(err, store.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "camera not found")
+	}
+
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to update camera")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, camera)
 }
 
 func (h *CameraHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		writeError(w, http.StatusBadRequest, "missing camera id")
+		return
+	}
 
+	err := h.svc.Delete(r.Context(), id)
+	if errors.Is(err, store.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "camera not found")
+		return
+	}
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to delete camera")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *CameraHandler) ReportOnline(w http.ResponseWriter, r *http.Request) {

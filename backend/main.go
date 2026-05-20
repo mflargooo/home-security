@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mflargooo/internal/api/handler"
 	"github.com/mflargooo/internal/config"
+	"github.com/mflargooo/internal/middleware"
 	"github.com/mflargooo/internal/service"
 	"github.com/mflargooo/internal/store"
 	"github.com/mflargooo/internal/workers"
@@ -64,7 +65,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:         cfg.ListenAddr,
-		Handler:      mux,
+		Handler:      middleware.Cors(mux),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,

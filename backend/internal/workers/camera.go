@@ -7,24 +7,23 @@ import (
 	"os/exec"
 	"sync"
 	"time"
+
+	"github.com/mflargooo/internal/models"
 )
 
 type FFmpegWorker struct {
 	id     string
+	url    string
 	cancel context.CancelFunc
 }
 
 type FFmpegManager struct {
 	mu       sync.Mutex
 	workers  map[string]*FFmpegWorker
-	resolver StreamResolver
+	resolver models.StreamResolver
 }
 
-type StreamResolver interface {
-	StreamURL(uri string) string
-}
-
-func NewFFmpegManager(resolver StreamResolver) *FFmpegManager {
+func NewFFmpegManager(resolver models.StreamResolver) *FFmpegManager {
 	return &FFmpegManager{
 		workers:  make(map[string]*FFmpegWorker),
 		resolver: resolver,
