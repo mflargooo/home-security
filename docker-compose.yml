@@ -7,7 +7,7 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - ${APP_DIR}/database/cameras-data:/var/lib/postgresql/data
+      - ${APP_DIR}/data/postgres:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}
     healthcheck:
@@ -48,8 +48,9 @@ services:
     image: bluenviron/mediamtx:latest
     restart: unless-stopped
     volumes:
-      - ${APP_DIR}/mediamtx/mediamtx.yml:/mediamtx.yml
+      - ${APP_DIR}/config/mediamtx/mediamtx.yml:/mediamtx.yml
     ports:
+      - 8554:8554
       - 8888:8888
     profiles: ["mediamtx"]
 
@@ -64,14 +65,20 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+    volumes: 
+      - ${APP_DIR}/data/buffer:/buffer
     ports:
       - 8080:8080
+    restart: unless-stopped
 
   # routing
   nginx:
     image: nginx:alpine
+    depends_on:
+      backend: 
+        condition: service_started
     volumes:
-      - "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
-      - "./frontend/dist:/usr/share/nginx/html:ro"
+      - ${APP_DIR}/config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${APP_DIR}/frontend/dist:/usr/share/nginx/html:ro
     ports:
-      - "19760:80"
+      - 19760:80

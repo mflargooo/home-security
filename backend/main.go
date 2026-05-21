@@ -55,9 +55,12 @@ func main() {
 	// -- Setup
 	cameraStore := store.NewCameraStore(db)
 	stateStore := store.NewCameraStateStore(rdb)
-	ffmpegManager := workers.NewFFmpegManager(cfg.MediaMTX)
+	ffmpegManager := workers.NewFFmpegManager(&cfg)
 	cameraSvc := service.NewCameraService(cameraStore, stateStore, ffmpegManager)
 	cameraHandler := handler.NewCameraHandler(cameraSvc)
+
+	// -- Start Buffer Live Cleanup Crew
+	workers.StartCleanupWorker(&cfg)
 
 	// -- Route
 	mux := http.NewServeMux()

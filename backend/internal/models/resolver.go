@@ -1,5 +1,7 @@
 package models
 
-type StreamResolver interface {
-	StreamURL(uri string) string
+type PathResolver interface {
+	StreamLiveURL(cameraID string) string
+	BufferLivePath(cameraID string) string
+	BufferSnapshotPath(cameraID string, sessionID string) string
 }

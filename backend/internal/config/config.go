@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	Postgres PostgresConfig
-	Redis    RedisConfig
-	MediaMTX MediaMTXConfig
+	Postgres  PostgresConfig
+	Redis     RedisConfig
+	MediaMTX  MediaMTXConfig
+	Directory DirectoryConfig
 }
 
 type PostgresConfig struct {
@@ -32,6 +33,10 @@ type MediaMTXConfig struct {
 	Port string
 }
 
+type DirectoryConfig struct {
+	Path string
+}
+
 func (cfg PostgresConfig) FormatDSN() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 }
@@ -44,12 +49,20 @@ func (cfg MediaMTXConfig) FormatDSN() string {
 	return fmt.Sprintf("rtsp://%s:%s", cfg.Host, cfg.Port)
 }
 
-func (cfg MediaMTXConfig) StreamURL(uri string) string {
-	return fmt.Sprintf("rtsp://%s:%s%s", cfg.Host, cfg.Port, uri)
+func (cfg *Config) StreamLiveURL(cameraID string) string {
+	return fmt.Sprintf("rtsp://%s:%s/live/%s", cfg.MediaMTX.Host, cfg.MediaMTX.Port, cameraID)
 }
 
-func Load() *Config {
-	return &Config{
+func (cfg *Config) BufferLivePath(cameraID string) string {
+	return fmt.Sprintf("/buffer/live/%s", cameraID)
+}
+
+func (cfg *Config) BufferSnapshotPath(cameraID string, sessionID string) string {
+	return fmt.Sprintf("/buffer/snapshot/%s-session-%s", cameraID, sessionID)
+}
+
+func Load() Config {
+	return Config{
 		Postgres: PostgresConfig{
 			Username: os.Getenv("POSTGRES_USER"),
 			Password: os.Getenv("POSTGRES_PASSWORD"),
@@ -67,6 +80,9 @@ func Load() *Config {
 		MediaMTX: MediaMTXConfig{
 			Host: os.Getenv("MEDIAMTX_HOST"),
 			Port: os.Getenv("MEDIAMTX_PORT"),
+		},
+		Directory: DirectoryConfig{
+			Path: os.Getenv("APP_DIR"),
 		},
 	}
 }

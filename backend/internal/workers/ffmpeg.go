@@ -3,7 +3,9 @@ package workers
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -20,10 +22,10 @@ type FFmpegWorker struct {
 type FFmpegManager struct {
 	mu       sync.Mutex
 	workers  map[string]*FFmpegWorker
-	resolver models.StreamResolver
+	resolver models.PathResolver
 }
 
-func NewFFmpegManager(resolver models.StreamResolver) *FFmpegManager {
+func NewFFmpegManager(resolver models.PathResolver) *FFmpegManager {
 	return &FFmpegManager{
 		workers:  make(map[string]*FFmpegWorker),
 		resolver: resolver,
@@ -67,8 +69,17 @@ func (m *FFmpegManager) DeleteWorker(id string) {
 }
 
 func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url string) {
-	outputURL := m.resolver.StreamURL("/stream/" + id)
-	log.Printf("[FFMPEG] worker=%s streaming video to public=%q", id, outputURL)
+	streamLiveURL := m.resolver.StreamLiveURL(id)
+	bufferLivePath := m.resolver.BufferLivePath(id)
+
+	if err := os.MkdirAll(bufferLivePath, 0755); err != nil {
+		log.Printf("[FFMPEG] buffer live path for worker=%s: %v\n", id, err)
+		return
+	}
+
+	teeOutput := fmt.Sprintf("[f=rtsp:rtsp_transport=tcp]%s|[f=segment:segment_time=60:strftime=1:reset_timestamps=1:segment_format=mp4]%s/%%Y-%%m-%%d_%%H-%%M-%%S.mp4", streamLiveURL, bufferLivePath)
+
+	log.Printf("[FFMPEG] worker=%s streaming=%q writing=%q", id, streamLiveURL, bufferLivePath)
 
 	for {
 		if ctx.Err() != nil {
@@ -81,9 +92,9 @@ func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url stri
 			"-rtsp_transport", "tcp",
 			"-i", url,
 			"-c", "copy",
-			"-f", "rtsp",
-			"-rtsp_transport", "tcp",
-			outputURL,
+			"-f", "tee",
+			"-map", "0",
+			teeOutput,
 		)
 
 		var stderr bytes.Buffer
