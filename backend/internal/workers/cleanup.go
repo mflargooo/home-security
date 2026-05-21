@@ -9,18 +9,14 @@ import (
 	"time"
 
 	"github.com/mflargooo/internal/models"
+	"github.com/mflargooo/internal/utils"
 )
 
 func StartCleanupWorker(resolver models.PathResolver) {
-	go func() {
-		ticker := time.NewTicker(5 * time.Minute)
-		defer ticker.Stop()
-
+	utils.Interval(func() {
 		log.Printf("[CLEANUP] started cleaner")
-		for range ticker.C {
-			cleanupSegments(resolver.BufferLivePath(""), 24*time.Hour)
-		}
-	}()
+		cleanupSegments(resolver.BufferLivePath(""), 24*time.Hour)
+	}, 5*time.Minute)
 }
 
 func cleanupSegments(root string, maxAge time.Duration) {
