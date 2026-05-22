@@ -12,14 +12,14 @@ import (
 	"github.com/mflargooo/internal/utils"
 )
 
-func StartCleanupWorker(resolver models.PathResolver) {
+func StartBufferCleanupWorker(resolver models.PathResolver) {
 	utils.Interval(func() {
-		log.Printf("[CLEANUP] started cleaner")
-		cleanupSegments(resolver.BufferLivePath(""), 24*time.Hour)
+		cleanupBufferSegments(resolver.BufferLivePath(""), 24*time.Hour)
 	}, 5*time.Minute)
+	log.Printf("[CLEANUP] started cleaner")
 }
 
-func cleanupSegments(root string, maxAge time.Duration) {
+func cleanupBufferSegments(root string, maxAge time.Duration) {
 	root = filepath.Clean(root)
 	cutoff := time.Now().Add(-maxAge)
 

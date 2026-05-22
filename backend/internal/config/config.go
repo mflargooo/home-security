@@ -53,12 +53,16 @@ func (cfg *Config) StreamLiveURL(cameraID string) string {
 	return fmt.Sprintf("rtsp://%s:%s/live/%s", cfg.MediaMTX.Host, cfg.MediaMTX.Port, cameraID)
 }
 
+func (cfg *Config) StreamSnapshotURL(sessionID string, segment string) string {
+	return fmt.Sprintf("/snapshots/%s/%s", sessionID, segment)
+}
+
 func (cfg *Config) BufferLivePath(cameraID string) string {
 	return fmt.Sprintf("/buffer/live/%s", cameraID)
 }
 
-func (cfg *Config) BufferSnapshotPath(cameraID string, sessionID string) string {
-	return fmt.Sprintf("/buffer/snapshot/%s-session-%s", cameraID, sessionID)
+func (cfg *Config) BufferSnapshotPath(sessionID string) string {
+	return fmt.Sprintf("/buffer/snapshot/%s", sessionID)
 }
 
 func Load() Config {

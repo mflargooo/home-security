@@ -102,7 +102,7 @@ func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url stri
 
 		err := cmd.Run()
 
-		if ctx.Err() != nil {
+		if err != nil {
 			return
 		}
 
