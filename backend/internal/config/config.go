@@ -66,7 +66,7 @@ func (cfg *Config) BufferSnapshotPath(sessionID string) string {
 	return fmt.Sprintf("/buffer/snapshot/%s", sessionID)
 }
 
-func (cfg *Config) SaveClipsPath(filename string) string {
+func (cfg *Config) SavedClipsPath(filename string) string {
 	return fmt.Sprintf("/data/clips/%s", filename)
 }
 

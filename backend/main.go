@@ -63,7 +63,8 @@ func main() {
 	snapshotHandler := handler.NewSnapshotHandler(snapshotSvc)
 
 	// -- Start Buffer Live Cleanup Crew
-	workers.StartBufferCleanupWorker(&cfg)
+	workers.StartBufferCleanupWorker(&cfg, 24*time.Hour)
+	workers.StartSnapshotCleanupWorker(&cfg, snapshotStore)
 
 	// -- Route
 	mux := http.NewServeMux()

@@ -37,6 +37,10 @@ func (s *SnapshotStore) Get(ctx context.Context, sessionID string) (string, erro
 	return cameraID, nil
 }
 
+func (s *SnapshotStore) Exists(ctx context.Context, sessionID string) (int64, error) {
+	return s.client.Exists(ctx, sessionKey(sessionID)).Result()
+}
+
 func (s *SnapshotStore) Delete(ctx context.Context, sessionID string) error {
 	return s.client.Del(ctx, sessionKey(sessionID)).Err()
 }
