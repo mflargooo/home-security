@@ -66,7 +66,9 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes: 
-      - ${APP_DIR}/data/buffer:/buffer
+      - ${APP_DIR}/data/live:/data/live
+      - ${APP_DIR}/data/snapshot:/data/snapshot
+      - ${SAVE_DIR}/clips:/data/clips
     ports:
       - 8080:8080
     restart: unless-stopped

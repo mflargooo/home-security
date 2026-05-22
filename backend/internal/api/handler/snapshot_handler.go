@@ -25,7 +25,6 @@ func (h *SnapshotHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("DELETE /snapshots/{sessionID}", h.EndSession)
 	mux.HandleFunc("GET /snapshots/{sessionID}/index.m3u8", h.GetPlaylist)
 	mux.HandleFunc("GET /snapshots/{sessionID}/{filename}", h.GetSegment)
-	mux.HandleFunc("POST /save", h.Save)
 }
 
 func (h *SnapshotHandler) StartSession(w http.ResponseWriter, r *http.Request) {
@@ -94,9 +93,4 @@ func (h *SnapshotHandler) GetSegment(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[SEGMENT] serving %s", h.svc.BuildSegmentPath(sessionID, filename))
 	http.ServeFile(w, r, h.svc.BuildSegmentPath(sessionID, filename))
-}
-
-func (h *SnapshotHandler) Save(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"online":"true"}`))
 }

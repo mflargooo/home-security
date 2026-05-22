@@ -34,7 +34,8 @@ type MediaMTXConfig struct {
 }
 
 type DirectoryConfig struct {
-	Path string
+	AppPath   string
+	ClipsPath string
 }
 
 func (cfg PostgresConfig) FormatDSN() string {
@@ -65,6 +66,10 @@ func (cfg *Config) BufferSnapshotPath(sessionID string) string {
 	return fmt.Sprintf("/buffer/snapshot/%s", sessionID)
 }
 
+func (cfg *Config) SaveClipsPath(filename string) string {
+	return fmt.Sprintf("/data/clips/%s", filename)
+}
+
 func Load() Config {
 	return Config{
 		Postgres: PostgresConfig{
@@ -86,7 +91,8 @@ func Load() Config {
 			Port: os.Getenv("MEDIAMTX_PORT"),
 		},
 		Directory: DirectoryConfig{
-			Path: os.Getenv("APP_DIR"),
+			AppPath:   os.Getenv("APP_DIR"),
+			ClipsPath: os.Getenv("CLIPS_DIR"),
 		},
 	}
 }
