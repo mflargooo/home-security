@@ -39,10 +39,10 @@ func NewClipManager(resolver models.PathResolver) *ClipManager {
 	}
 }
 
-func (m *ClipManager) Dispatch(onDone func(clipID string, status models.ClipStatus, filePath string), jobs ...ClipJob) {
+func (m *ClipManager) Dispatch(ctx context.Context, onDone func(clipID string, status models.ClipStatus, filePath string), jobs ...ClipJob) {
 	for _, job := range jobs {
 		go func(j ClipJob) {
-			if err := utils.Retry(context.Background(), func() error { return runClipWorker(context.Background(), j) }, 3); err != nil {
+			if err := utils.Retry(ctx, func() error { return runClipWorker(ctx, j) }, 3); err != nil {
 				onDone(j.ClipID, "failed", "")
 			} else {
 				onDone(j.ClipID, "ready", j.FinalPath)

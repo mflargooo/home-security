@@ -80,7 +80,7 @@ func (s *ClipService) Save(ctx context.Context, req models.CreateClipRequest) (s
 		Segments:  linkedSegments,
 	}
 
-	s.manager.Dispatch(
+	s.manager.Dispatch(ctx,
 		func(clipID string, status models.ClipStatus, filePath string) {
 			s.clipStore.UpdateStatus(ctx, clipID, status, filePath)
 		}, job)

@@ -96,5 +96,5 @@ func (s *CameraService) onCameraUpdated(ctx context.Context, id string, url stri
 		return
 	}
 
-	s.manager.UpsertWorker(id, url)
+	s.manager.UpsertWorker(ctx, id, url)
 }

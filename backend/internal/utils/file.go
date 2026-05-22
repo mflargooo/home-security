@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -24,10 +25,15 @@ func MoveFile(src string, dst string) error { // deletes from src
 	}
 	defer out.Close()
 
+	log.Printf("[MOVING] from=%s to=%s", src, dst)
 	if _, err := io.Copy(out, in); err != nil {
 		os.Remove(dst)
 		return fmt.Errorf("copy file: %w", err)
 	}
 
-	return fmt.Errorf("remove file: %v", os.Remove(src).Error())
+	if err := os.Remove(src); err != nil {
+		return fmt.Errorf("remove file: %v", err.Error())
+	}
+
+	return nil
 }
