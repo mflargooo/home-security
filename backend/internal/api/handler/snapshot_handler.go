@@ -24,7 +24,7 @@ func (h *SnapshotHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /snapshots/{cameraID}", h.StartSession) // response contains session id
 	mux.HandleFunc("DELETE /snapshots/{sessionID}", h.EndSession)
 	mux.HandleFunc("GET /snapshots/{sessionID}/index.m3u8", h.GetPlaylist)
-	mux.HandleFunc("GET /snapshots/{sessionID}/{filename}", h.GetSegment)
+	mux.HandleFunc("GET /snapshots/{sessionID}/{filename}", h.GetSnapshot)
 }
 
 func (h *SnapshotHandler) StartSession(w http.ResponseWriter, r *http.Request) {
@@ -87,10 +87,10 @@ func (h *SnapshotHandler) GetPlaylist(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(playlist))
 }
 
-func (h *SnapshotHandler) GetSegment(w http.ResponseWriter, r *http.Request) {
+func (h *SnapshotHandler) GetSnapshot(w http.ResponseWriter, r *http.Request) {
 	sessionID := r.PathValue("sessionID")
 	filename := r.PathValue("filename")
 
-	log.Printf("[SEGMENT] serving %s", h.svc.BuildSegmentPath(sessionID, filename))
+	log.Printf("[SNAPSHOT] serving %s", h.svc.BuildSegmentPath(sessionID, filename))
 	http.ServeFile(w, r, h.svc.BuildSegmentPath(sessionID, filename))
 }

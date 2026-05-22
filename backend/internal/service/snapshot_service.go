@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,10 @@ import (
 
 	"github.com/mflargooo/internal/models"
 	"github.com/mflargooo/internal/store"
+)
+
+var (
+	ErrSessionNotFound = errors.New("snapshot session not found or expired")
 )
 
 type SnapshotService struct {
@@ -104,8 +109,6 @@ func (s *SnapshotService) createHardlinks(sessionID string, cameraID string) err
 		return err
 	}
 
-	log.Printf("[HARDLINKS] created %s", dstDir)
-
 	entries, err := os.ReadDir(srcDir)
 	if err != nil {
 		return err
@@ -128,5 +131,6 @@ func (s *SnapshotService) createHardlinks(sessionID string, cameraID string) err
 		}
 	}
 
+	log.Printf("[HARDLINKS] created %s", dstDir)
 	return nil
 }

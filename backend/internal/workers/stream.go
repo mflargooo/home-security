@@ -13,26 +13,26 @@ import (
 	"github.com/mflargooo/internal/models"
 )
 
-type FFmpegWorker struct {
+type PullStreamWorker struct {
 	id     string
 	url    string
 	cancel context.CancelFunc
 }
 
-type FFmpegManager struct {
+type PullStreamManager struct {
 	mu       sync.Mutex
-	workers  map[string]*FFmpegWorker
+	workers  map[string]*PullStreamWorker
 	resolver models.PathResolver
 }
 
-func NewFFmpegManager(resolver models.PathResolver) *FFmpegManager {
-	return &FFmpegManager{
-		workers:  make(map[string]*FFmpegWorker),
+func NewPullStreamManager(resolver models.PathResolver) *PullStreamManager {
+	return &PullStreamManager{
+		workers:  make(map[string]*PullStreamWorker),
 		resolver: resolver,
 	}
 }
 
-func (m *FFmpegManager) UpsertWorker(id string, url string) {
+func (m *PullStreamManager) UpsertWorker(id string, url string) {
 	m.mu.Lock()
 
 	if old, ok := m.workers[id]; ok {
@@ -45,7 +45,7 @@ func (m *FFmpegManager) UpsertWorker(id string, url string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	worker := &FFmpegWorker{
+	worker := &PullStreamWorker{
 		id:     id,
 		url:    url,
 		cancel: cancel,
@@ -55,10 +55,10 @@ func (m *FFmpegManager) UpsertWorker(id string, url string) {
 
 	m.mu.Unlock()
 
-	go m.runFFmpegWorker(ctx, id, url)
+	go m.runPullStreamWorker(ctx, id, url)
 }
 
-func (m *FFmpegManager) DeleteWorker(id string) {
+func (m *PullStreamManager) DeleteWorker(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -68,7 +68,7 @@ func (m *FFmpegManager) DeleteWorker(id string) {
 	}
 }
 
-func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url string) {
+func (m *PullStreamManager) runPullStreamWorker(ctx context.Context, id string, url string) {
 	streamLiveURL := m.resolver.StreamLiveURL(id)
 	bufferLivePath := m.resolver.BufferLivePath(id)
 

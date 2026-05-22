@@ -1,0 +1,1 @@
+-- migrations/0002_create_clips.down.sql

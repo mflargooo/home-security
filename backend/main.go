@@ -56,11 +56,17 @@ func main() {
 	cameraStore := store.NewCameraStore(db)
 	stateStore := store.NewCameraStateStore(rdb)
 	snapshotStore := store.NewSnapshotStore(rdb)
-	ffmpegManager := workers.NewFFmpegManager(&cfg)
+	clipStore := store.NewClipStore(db)
+
+	ffmpegManager := workers.NewPullStreamManager(&cfg)
+	clipManager := workers.NewClipManager(&cfg)
+
 	cameraSvc := service.NewCameraService(cameraStore, stateStore, ffmpegManager)
 	snapshotSvc := service.NewSnapshotService(snapshotStore, &cfg)
+	clipSvc := service.NewClipService(clipStore, snapshotStore, clipManager, &cfg)
 	cameraHandler := handler.NewCameraHandler(cameraSvc)
 	snapshotHandler := handler.NewSnapshotHandler(snapshotSvc)
+	clipHandler := handler.NewClipHandler(clipSvc)
 
 	// -- Start Buffer Live Cleanup Crew
 	workers.StartBufferCleanupWorker(&cfg, 24*time.Hour)
@@ -70,6 +76,7 @@ func main() {
 	mux := http.NewServeMux()
 	cameraHandler.RegisterRoutes(mux)
 	snapshotHandler.RegisterRoutes(mux)
+	clipHandler.RegisterRoutes(mux)
 
 	server := &http.Server{
 		Addr:         ":8080",

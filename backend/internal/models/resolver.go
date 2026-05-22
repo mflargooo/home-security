@@ -5,5 +5,6 @@ type PathResolver interface {
 	StreamSnapshotURL(sessionID string, segment string) string
 	BufferLivePath(cameraID string) string
 	BufferSnapshotPath(sessionID string) string
-	SavedClipsPath(filename string) string
+	TmpClipsPath(clipID string) string
+	SavedClipsPath(cameraID string, clipID string) string
 }

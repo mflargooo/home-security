@@ -82,7 +82,7 @@ func cleanupSnapshotSegments(root string, snapshotStore *store.SnapshotStore) {
 		}
 
 		if exists == 0 {
-			path := root + "/" + entry.Name()
+			path := root + entry.Name()
 			log.Printf("[CLEANUP] removing expired snapshot %s", path)
 			os.RemoveAll(path)
 		}

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mflargooo/internal/models"
@@ -38,11 +37,10 @@ func (s *CameraStore) Create(ctx context.Context, req models.CreateCameraRequest
 	}
 
 	now := time.Now().UTC()
-	id := uuid.New().String()
 
 	query := `
-		INSERT INTO cameras (id, name, rtsp_url, status, metadata, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO cameras (name, rtsp_url, status, metadata, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		ON CONFLICT (rtsp_url) DO UPDATE SET
 			name = EXCLUDED.name,
 			metadata = EXCLUDED.metadata,
@@ -55,7 +53,6 @@ func (s *CameraStore) Create(ctx context.Context, req models.CreateCameraRequest
 	var wasInserted bool
 
 	err = s.db.QueryRow(ctx, query,
-		id,
 		req.Name,
 		req.RTSPUrl,
 		models.StatusActive,
@@ -68,8 +65,8 @@ func (s *CameraStore) Create(ctx context.Context, req models.CreateCameraRequest
 		&camera.RTSPUrl,
 		&camera.Status,
 		&metaOut,
-		&now,
-		&now,
+		&camera.CreatedAt,
+		&camera.UpdatedAt,
 		&wasInserted,
 	)
 	if err != nil {

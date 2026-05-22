@@ -59,15 +59,19 @@ func (cfg *Config) StreamSnapshotURL(sessionID string, segment string) string {
 }
 
 func (cfg *Config) BufferLivePath(cameraID string) string {
-	return fmt.Sprintf("/buffer/live/%s", cameraID)
+	return fmt.Sprintf("/data/live/%s", cameraID)
 }
 
 func (cfg *Config) BufferSnapshotPath(sessionID string) string {
-	return fmt.Sprintf("/buffer/snapshot/%s", sessionID)
+	return fmt.Sprintf("/data/snapshot/%s", sessionID)
 }
 
-func (cfg *Config) SavedClipsPath(filename string) string {
-	return fmt.Sprintf("/data/clips/%s", filename)
+func (cfg *Config) TmpClipsPath(clipID string) string {
+	return fmt.Sprintf("/data/clips/%s", clipID)
+}
+
+func (cfg *Config) SavedClipsPath(cameraID string, clipID string) string {
+	return fmt.Sprintf("/clips/%s/%s", cameraID, clipID)
 }
 
 func Load() Config {

@@ -66,9 +66,8 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes: 
-      - ${APP_DIR}/data/live:/data/live
-      - ${APP_DIR}/data/snapshot:/data/snapshot
-      - ${SAVE_DIR}/clips:/data/clips
+      - ${APP_DIR}/data:/data
+      - ${SAVE_DIR}/clips:/clips
     ports:
       - 8080:8080
     restart: unless-stopped
@@ -78,6 +77,8 @@ services:
     image: nginx:alpine
     depends_on:
       backend: 
+        condition: service_started
+      mediamtx:
         condition: service_started
     volumes:
       - ${APP_DIR}/config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro

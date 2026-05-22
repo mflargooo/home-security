@@ -44,7 +44,7 @@ func (h *CameraHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := validateCreateRequest(req); err != nil {
+	if err := validateCameraCreateRequest(req); err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -171,6 +171,6 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
 }
 
-func validateCreateRequest(req models.CreateCameraRequest) error {
+func validateCameraCreateRequest(req models.CreateCameraRequest) error {
 	return nil
 }

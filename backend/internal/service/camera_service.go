@@ -13,10 +13,10 @@ import (
 type CameraService struct {
 	cameraStore *store.CameraStore
 	stateStore  *store.CameraStateStore
-	manager     *workers.FFmpegManager
+	manager     *workers.PullStreamManager
 }
 
-func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraStateStore, manager *workers.FFmpegManager) *CameraService {
+func NewCameraService(cameraStore *store.CameraStore, stateStore *store.CameraStateStore, manager *workers.PullStreamManager) *CameraService {
 	return &CameraService{
 		cameraStore: cameraStore,
 		stateStore:  stateStore,
