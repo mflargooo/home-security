@@ -77,7 +77,7 @@ func (m *FFmpegManager) runFFmpegWorker(ctx context.Context, id string, url stri
 		return
 	}
 
-	teeOutput := fmt.Sprintf("[f=rtsp:rtsp_transport=tcp]%s|[f=segment:segment_time=60:strftime=1:reset_timestamps=1:segment_format=mp4]%s/%%Y-%%m-%%d_%%H-%%M-%%S.mp4", streamLiveURL, bufferLivePath)
+	teeOutput := fmt.Sprintf("[f=rtsp:rtsp_transport=tcp]%s|[f=segment:segment_time=60:strftime=1:reset_timestamps=1:segment_format=ts]%s/%%Y-%%m-%%d_%%H-%%M-%%S.ts", streamLiveURL, bufferLivePath)
 
 	log.Printf("[FFMPEG] worker=%s streaming=%q writing=%q", id, streamLiveURL, bufferLivePath)
 

@@ -66,7 +66,7 @@ func (s *SnapshotService) BuildSegmentPath(sessionID string, filename string) st
 }
 
 func parseTimestampFromFilename(filename string) time.Time {
-	name := strings.TrimSuffix(filename, ".mp4")
+	name := strings.TrimSuffix(filename, ".ts")
 	t, err := time.ParseInLocation("2006-01-02_15-04-05", name, time.UTC)
 	if err != nil {
 		return time.Time{}
@@ -87,7 +87,7 @@ func (s *SnapshotService) getSegments(sessionID string) ([]string, error) {
 		if entry.IsDir() {
 			continue
 		}
-		if !strings.HasSuffix(entry.Name(), ".mp4") {
+		if !strings.HasSuffix(entry.Name(), ".ts") {
 			continue
 		}
 
