@@ -47,6 +47,7 @@ func (h *ClipHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.SessionID = r.PathValue("id")
 	clipID, err := h.svc.Save(r.Context(), req)
 	if err != nil {
 		log.Printf("create clip: %v", err)

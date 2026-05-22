@@ -11,8 +11,7 @@ const (
 )
 
 type CreateClipRequest struct {
-	CameraID  string    `json:"camera_id"`
-	SessionID string    `json:"session_id"`
+	SessionID string
 	Start     time.Time `json:"start_time"`
 	End       time.Time `json:"end_time"`
 }

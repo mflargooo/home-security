@@ -32,7 +32,7 @@ func NewPullStreamManager(resolver models.PathResolver) *PullStreamManager {
 	}
 }
 
-func (m *PullStreamManager) UpsertWorker(ctx context.Context, id string, url string) {
+func (m *PullStreamManager) UpsertWorker(id string, url string) {
 	m.mu.Lock()
 
 	if old, ok := m.workers[id]; ok {
@@ -43,7 +43,7 @@ func (m *PullStreamManager) UpsertWorker(ctx context.Context, id string, url str
 		old.cancel()
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	worker := &PullStreamWorker{
 		id:     id,

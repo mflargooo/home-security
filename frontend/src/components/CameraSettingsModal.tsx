@@ -19,8 +19,8 @@ export function CameraSettingsModal({ camera, onClose } : CameraSettingsModalPro
         const formData = new FormData(e.currentTarget);
         const updatedData = Object.fromEntries(formData.entries())
         
-        camera.id = updatedData["ID"].toString()
-        camera.name = updatedData["Name"].toString()
+        camera.id = updatedData["Camera ID"].toString()
+        camera.name = updatedData["Camera Name"].toString()
         camera.rtsp_url = updatedData["RTSP Url"].toString()
 
         await updateCamera(camera.id, camera)

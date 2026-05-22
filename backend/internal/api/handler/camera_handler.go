@@ -123,6 +123,7 @@ func (h *CameraHandler) Update(w http.ResponseWriter, r *http.Request) {
 	camera, err := h.svc.Update(r.Context(), id, req)
 	if errors.Is(err, store.ErrNotFound) {
 		writeError(w, http.StatusNotFound, "camera not found")
+		return
 	}
 
 	if err != nil {

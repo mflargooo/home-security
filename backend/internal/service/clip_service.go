@@ -31,16 +31,15 @@ func NewClipService(clipStore *store.ClipStore, snapshotStore *store.SnapshotSto
 
 func (s *ClipService) Save(ctx context.Context, req models.CreateClipRequest) (string, error) {
 	sessionID := req.SessionID
-	cameraID := req.CameraID
 	start := req.Start
 	end := req.End
 
-	storedCameraID, err := s.snapshotStore.Get(ctx, sessionID)
+	cameraID, err := s.snapshotStore.Get(ctx, sessionID)
 	if err != nil {
 		return "", fmt.Errorf("get session: %w", err)
 	}
 
-	if storedCameraID == "" {
+	if cameraID == "" {
 		return "", ErrSessionNotFound
 	}
 
@@ -80,9 +79,11 @@ func (s *ClipService) Save(ctx context.Context, req models.CreateClipRequest) (s
 		Segments:  linkedSegments,
 	}
 
-	s.manager.Dispatch(ctx,
+	timeout, cancel := context.WithTimeout(context.Background(), 2*end.Sub(start))
+	s.manager.Dispatch(timeout,
 		func(clipID string, status models.ClipStatus, filePath string) {
 			s.clipStore.UpdateStatus(ctx, clipID, status, filePath)
+			cancel()
 		}, job)
 
 	return clipID, nil
