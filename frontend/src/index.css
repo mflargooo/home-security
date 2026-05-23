@@ -37,3 +37,11 @@ form button {
 form button:disabled {
   @apply bg-slate-700 text-slate-600 border-slate-800;
 }
+
+button#create {
+  @apply flex w-fit h-fit bg-lime-700 hover:bg-lime-500 border border-2 border-lime-900 hover:border-lime-700 rounded-md font-bold text-white justify-center items-center;
+}
+
+button#create:disabled {
+  @apply bg-slate-700 text-slate-600 border-slate-800;
+}

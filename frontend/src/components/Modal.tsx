@@ -8,6 +8,7 @@
     }
 
     type ModalProps = ModalBarProps & {
+        hidden?: boolean
         className?: string
         children?: ReactNode;
     }
@@ -24,10 +25,10 @@
         )
     }
 
-    export function Modal({ title, onClose, ellipsisOnClick, className, children } : ModalProps ) {
+    export function Modal({ title, onClose, ellipsisOnClick, hidden=false, className, children } : ModalProps ) {
         
         return (
-            <div 
+            <div hidden={hidden}
                 className="fixed inset-0 z-50 flex modal-backdrop items-center justify-center bg-slate-900/80" 
                 onClick={(e) => e.target === e.currentTarget ? onClose() : (() => {})()}
             >
