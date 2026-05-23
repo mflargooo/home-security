@@ -15,10 +15,10 @@ type ClipHandler struct {
 }
 
 func (h *ClipHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /clip/{id}", h.GetByID)
-	mux.HandleFunc("GET /clip", h.List)
-	mux.HandleFunc("POST /clip/{id}", h.Create)
-	mux.HandleFunc("DELETE /clip/{id}", h.Delete)
+	mux.HandleFunc("GET /clips/{id}", h.GetByID)
+	mux.HandleFunc("GET /clips", h.List)
+	mux.HandleFunc("POST /clips/{id}", h.Create)
+	mux.HandleFunc("DELETE /clips/{id}", h.Delete)
 }
 
 func NewClipHandler(svc *service.ClipService) *ClipHandler {

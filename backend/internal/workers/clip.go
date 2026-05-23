@@ -1,7 +1,6 @@
 package workers
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -51,24 +50,6 @@ func (m *ClipManager) Dispatch(ctx context.Context, onDone func(clipID string, s
 	}
 }
 
-func writeConcatFile(path string, segments []string) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := bufio.NewWriter(f)
-
-	for _, seg := range segments {
-		if _, err := fmt.Fprintf(w, "file '%s'\n", seg); err != nil {
-			return err
-		}
-	}
-
-	return w.Flush()
-}
-
 func runClipWorker(ctx context.Context, job ClipJob) error {
 	if len(job.Segments) <= 0 {
 		return fmt.Errorf("no segments")
@@ -94,14 +75,7 @@ func runClipWorker(ctx context.Context, job ClipJob) error {
 		return fmt.Errorf("invalid clip duration")
 	}
 
-	concatFile, _ := os.CreateTemp(os.TempDir(), "clip_*_concat.txt")
-	concatPath := concatFile.Name()
-	concatFile.Close()
-	defer os.Remove(concatPath)
-
-	if err := writeConcatFile(concatPath, job.Segments); err != nil {
-		return err
-	}
+	concatPath := ""
 
 	cmd := exec.CommandContext(
 		ctx,

@@ -31,7 +31,7 @@ func cleanupBufferSegments(root string, maxAge time.Duration) {
 			return nil
 		}
 
-		if !strings.HasSuffix(path, ".mp4") {
+		if !strings.HasSuffix(path, ".ts") {
 			return nil
 		}
 

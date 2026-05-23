@@ -7,9 +7,10 @@ import "../index.css"
 type CameraSettingsModalProps = {
     camera: Camera;
     onClose: () => void;
+    hidden?: boolean
 }
 
-export function CameraSettingsModal({ camera, onClose } : CameraSettingsModalProps) {
+export function CameraSettingsModal({ camera, onClose, hidden=false } : CameraSettingsModalProps) {
     const [canUpdate, setCanUpdate] = useState<boolean>(false);
 
     const handleFormSubmit = async (e : any) => {
@@ -23,7 +24,9 @@ export function CameraSettingsModal({ camera, onClose } : CameraSettingsModalPro
         camera.name = updatedData["Camera Name"].toString()
         camera.rtsp_url = updatedData["RTSP Url"].toString()
 
-        await updateCamera(camera.id, camera)
+        await updateCamera(camera)
+
+        onClose()
     }
 
     const isFormChanged = (e : any) => {
@@ -33,7 +36,7 @@ export function CameraSettingsModal({ camera, onClose } : CameraSettingsModalPro
     }
 
     return (
-        <Modal className="w-full max-w-lg lg:max-w-xl" title={"SETTINGS"} onClose={() => onClose()}>
+        <Modal hidden={hidden} className="w-full max-w-lg lg:max-w-xl" title={"SETTINGS"} onClose={() => onClose()}>
             <div className="bg-black h-[.5px]"></div>
             <form onChange={(e) => setCanUpdate(isFormChanged(e))} onSubmit={handleFormSubmit} className="p-5">
                 <div className="form-category">

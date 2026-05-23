@@ -77,7 +77,11 @@ func (m *PullStreamManager) runPullStreamWorker(ctx context.Context, id string, 
 		return
 	}
 
-	teeOutput := fmt.Sprintf("[f=rtsp:rtsp_transport=tcp]%s|[f=segment:segment_time=60:strftime=1:reset_timestamps=1:segment_format=ts]%s/%%Y-%%m-%%d_%%H-%%M-%%S.ts", streamLiveURL, bufferLivePath)
+	teeOutput := fmt.Sprintf(
+		"[f=rtsp:rtsp_transport=tcp]%s|[f=segment:segment_time=4:strftime=1:reset_timestamps=1]%s/%%Y-%%m-%%d_%%H-%%M-%%S.ts",
+		streamLiveURL,
+		bufferLivePath,
+	)
 
 	log.Printf("[FFMPEG] worker=%s streaming=%q writing=%q", id, streamLiveURL, bufferLivePath)
 
